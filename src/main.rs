@@ -566,6 +566,193 @@ fn test_change_value() {
 
     change_value(value_borrow1);
     // change_value(valueBorrow2);
-    
+
     println!("{}", value);
+}
+//-------------------------------
+
+fn get_full_name(first_name: &String, last_name: &String) -> String {
+    let name = format!("{} {}", first_name, last_name);
+    return name;
+}
+
+#[test]
+fn test_get_full_name() {
+    let first_name = String::from("Jaka");
+    let last_name = String::from("Kelana");
+
+    let name = get_full_name(&first_name, &last_name);
+    println!("{}", name);
+}
+//----------------------------------------------
+
+#[test]
+fn slice_reference() {
+    let array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    let slice1: &[i32] = &array[..];
+    println!("{:?}", slice1);
+
+    let slice2: &[i32] = &array[0..5];
+    println!("{:?}", slice2);
+
+    let slice3: &[i32] = &array[5..];
+    println!("{:?}", slice3);
+}
+
+#[test]
+fn string_slice() {
+    let name = String::from("Jaka Kelana Umbara");
+    let first_name = &name[0..4];
+    println!("{}", first_name);
+
+    let last_name = &name[5..];
+    println!("{}", last_name);
+}
+//-------------------------------
+
+// struct Person {
+//     first_name: String,
+//     middle_name: String,
+//     last_name: String,
+//     age: u8,
+// }
+
+// impl Person {
+//     fn say_hello(&self, name: &str) {
+//         println!("Hello {}, my name is {}", name, self.first_name);
+//     }
+// }
+
+// fn print_person(person: &Person) {
+//     println!("First Name: {}", person.first_name);
+//     println!("Middle Name: {}", person.middle_name);
+//     println!("Last Name: {}", person.last_name);
+//     println!("Age: {}", person.age);
+// }
+
+// #[test]
+// fn struct_person() {
+//     let person = Person {
+//         first_name: String::from("Jaka"),
+//         middle_name: String::from("Kelana"),
+//         last_name: String::from("Umbara"),
+//         age: 20,
+//     };
+
+//     print_person(&person);
+// }
+
+// Init Shorthand -- Struct Update Syntax
+#[test]
+fn struct_person() {
+    let first_name = String::from("Jaka");
+    let last_name = String::from("Umbara");
+
+    let person = Person {
+        first_name,
+        middle_name: String::from("Kelana"),
+        last_name,
+        age: 20,
+    };
+
+    print_person(&person);
+    // println!("{}", last_name);
+
+    let person2 = Person{
+        first_name: person.first_name.clone(),
+        middle_name: person.middle_name.clone(),
+        last_name: person.last_name.clone(),
+        ..person
+    };
+    print_person(&person2);
+
+    // println!("{}", person.first_name);
+}
+
+// Tuple Struct ------
+struct GeoPoint(f64, f64);
+
+impl GeoPoint {
+    fn new(long: f64, lat: f64) -> GeoPoint {
+        GeoPoint(long, lat)
+    }
+}
+
+#[test]
+fn test_associated_function() {
+    let geo_point = GeoPoint::new(10.11, 12.22);
+    println!("{}", geo_point.0);
+    println!("{}", geo_point.1);
+}
+
+#[test]
+fn tuple_struct() {
+    let geo_point = GeoPoint(-6.2123456, 106.816666);
+    println!("long: {}", geo_point.0);
+    println!("lat: {}", geo_point.1);
+}
+
+// Struct Kosong
+struct Nothing;
+
+#[test]
+fn test_nothing() {
+    let _nothing1 = Nothing;
+    let _nothing2 = Nothing{};
+}
+
+// Reference Field di Struct --------------
+
+// Membuat Method ----------------- 
+// impl Person {
+//     fn say_hello(&self, name: &str) {
+//         println!("Hello, {} my name is {}", name, self.first_name)
+//     }
+// }
+
+struct Person {
+    first_name: String,
+    middle_name: String,
+    last_name: String,
+    age: u8,
+}
+
+impl Person {
+    fn say_hello(&self, name: &str) {
+        println!("Hello {}, my name is {}", name, self.first_name);
+    }
+}
+
+fn print_person(person: &Person) {
+    println!("First Name: {}", person.first_name);
+    println!("Middle Name: {}", person.middle_name);
+    println!("Last Name: {}", person.last_name);
+    println!("Age: {}", person.age);
+}
+
+#[test]
+fn test_method() {
+    let person = Person {
+        first_name: String::from("Jaka"),
+        middle_name: String::from("Kelana"),
+        last_name: String::from("Umbara"),
+        age: 20,
+    };
+
+    person.say_hello("Budi");
+
+    println!("{}", person.first_name);
+}
+
+// Enum ----------------
+enum Level {
+    Regular,
+    Premium,
+    Platinum,
+}
+
+#[test]
+fn test_enum() {
+    let _level = Level::Premium;
 }
