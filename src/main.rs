@@ -1140,7 +1140,10 @@ fn test_generic_method() {
     println!("{}", point.get_value());
 }
 
-trait GetValue<T> where T: PartialOrd {
+trait GetValue<T>
+where
+    T: PartialOrd,
+{
     fn get_value(&self) -> &T;
 }
 
@@ -1150,6 +1153,157 @@ impl<T: PartialOrd> GetValue<T> for Point<T> {
     }
 }
 
+use std::collections::VecDeque;
+use std::ops::Add;
+
 struct Apple {
     quantity: i32,
+}
+
+impl Add for Apple {
+    type Output = Apple;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Apple {
+            quantity: self.quantity + rhs.quantity,
+        }
+    }
+}
+
+#[test]
+fn test_operator_add() {
+    let apple1 = Apple { quantity: 10 };
+    let apple2 = Apple { quantity: 20 };
+
+    let apple3 = apple1 + apple2;
+    println!("{}", apple3.quantity);
+}
+
+fn double(value: Option<i32>) -> Option<i32> {
+    match value {
+        None => None,
+        Some(i) => Some(i * 2),
+    }
+}
+
+#[test]
+fn test_option() {
+    let result = double(Some(10));
+    println!("{:?}", result);
+
+    let result = double(None);
+    println!("{:?}", result);
+}
+
+impl PartialEq for Apple {
+    fn eq(&self, other: &Self) -> bool {
+        self.quantity == other.quantity
+    }
+}
+
+impl PartialOrd for Apple {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.quantity.partial_cmp(&other.quantity)
+    }
+}
+
+#[test]
+fn test_partial_cmp() {
+    let apple1 = Apple { quantity: 10 };
+    let apple2 = Apple { quantity: 20 }; 
+
+    println!("Apple 1 == Apple 2: {}", apple1 == apple2);
+    println!("Apple 1 > Apple 2: {}", apple1 > apple2);
+    println!("Apple 1 < Apple 2: {}", apple1 < apple2);
+}
+
+struct Category {
+    id: String,
+    name: String,
+}
+
+use std::fmt::{Debug, Formatter};
+
+impl Debug for Category {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Category")
+            .field("id", &self.id)
+            .field("name", &self.name)
+            .finish()
+    }
+}
+
+#[test]
+fn test_debug() {
+    let category = Category {
+        id: String::from("Gadget"),
+        name: String::from("Laptop"),
+    };
+    println!("{:?}", category);
+}
+
+#[test]
+fn test_closure() {
+    let sum: fn(i32, i32) -> i32 = |value1: i32, value2:i32| -> i32 { value1 + value2 };
+
+    let result = sum(10, 20);
+    println!("{}", result);
+}
+
+struct  Counter {
+    counter: i32,
+}
+
+impl Counter {
+    fn increment(&mut self) {
+        self.counter += 1;
+        println!("Increment")
+    }
+}
+
+#[test]
+fn test_counter() {
+    let mut counter = Counter { counter: 0 };
+    counter.increment();
+    counter.increment();
+    counter.increment();
+
+    println!("Counter {}", counter.counter);
+}
+
+#[test]
+fn test_vector() {
+
+    let array = ["Eko", "Kurniawan", "Khannedy"];
+
+    for value in array {
+        println!("{}", value);
+    }
+
+    println!("{:?}", array);
+
+    let mut names = Vec::new();
+    names.push(String::from("Jaka"));
+    names.push(String::from("Umbara"));
+    names.push(String::from("Kelana"));
+
+    for name in &names {
+        println!("{}", name);
+    } 
+
+    println!("{:?}", names);
+}
+
+#[test]
+fn test_vector_deque() {
+    let mut names = VecDeque::new();
+    names.push_back(String::from("Jaka"));
+    names.push_back(String::from("Kelana"));
+    names.push_front(String::from("Umbara"));
+
+    for name in &names {
+        println!("{}", name);
+    } 
+
+    println!("{:?}", names[1]);
 }
