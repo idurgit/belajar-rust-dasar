@@ -10,6 +10,7 @@ use second::say_hello as say_hello_second;
 fn test_use() {
     say_hello();
     say_hello_second();
+    first::second::third::say_hello();
 }
 
 #[test]
@@ -957,4 +958,198 @@ fn test_match_expression() {
     };
 
     println!("{}", result);
+}
+
+trait CanSayHello {
+    fn hello(&self) -> String {
+        String::from("Hello")
+    }
+    fn say_hello(&self) -> String;
+    fn say_hello_to(&self, name: &str) -> String;
+}
+
+trait CanSayGoodBye {
+    fn say_goodbye(&self) -> String;
+    fn say_goodbye_to(&self, name: &str) -> String;
+}
+
+impl CanSayGoodBye for Person {
+    fn say_goodbye(&self) -> String {
+        format!("Goodbye, my name is {}", self.first_name)
+    }
+    fn say_goodbye_to(&self, name: &str) -> String {
+        format!("Goodbye {}, my name is {}", name, self.first_name)
+    }
+}
+
+impl CanSayHello for Person {
+    fn say_hello(&self) -> String {
+        format!("Hello, my name is {}", self.first_name)
+    }
+    fn say_hello_to(&self, name: &str) -> String {
+        format!("Hello {}, my name is {}", name, self.first_name)
+    }
+}
+
+fn say_hello_trait(value: &impl CanSayHello) {
+    println!("{}", value.say_hello());
+}
+
+fn hello_and_goodbye(value: &(impl CanSayHello + CanSayGoodBye)) {
+    println!("{}", value.say_hello());
+    println!("{}", value.say_goodbye());
+}
+
+#[test]
+fn test_trait() {
+    let person = Person {
+        first_name: String::from("Jaka"),
+        middle_name: String::from("Kelana"),
+        last_name: String::from("Umbara"),
+        age: 20,
+    };
+
+    say_hello_trait(&person);
+
+    hello_and_goodbye(&person);
+
+    let result = person.say_hello_to("Agus");
+    println!("{}", result);
+
+    let result = person.hello();
+    println!("{}", result);
+
+    println!("{}", person.say_goodbye());
+    println!("{}", person.say_goodbye_to("Budi"));
+}
+
+struct SimplePerson {
+    name: String,
+}
+
+impl CanSayGoodBye for SimplePerson {
+    fn say_goodbye(&self) -> String {
+        format!("Goodbye, my name is {}", self.name)
+    }
+    fn say_goodbye_to(&self, name: &str) -> String {
+        format!("Goodbye {}, my name is {}", name, self.name)
+    }
+}
+
+fn create_person(name: String) -> impl CanSayGoodBye {
+    SimplePerson { name }
+}
+
+#[test]
+fn test_return_trait() {
+    let person = create_person(String::from("Jaka"));
+    println!("{}", person.say_goodbye());
+    println!("{}", person.say_goodbye_to("Budi"));
+}
+
+trait CanSay: CanSayHello + CanSayGoodBye {
+    fn say(&self) -> String {
+        format!("{} {}", self.say_hello(), self.say_goodbye())
+    }
+}
+
+struct SimpleMan {
+    name: String,
+}
+
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Point<T> {
+    fn get_x(&self) -> &T {
+        &self.x
+    }
+
+    fn get_y(&self) -> &T {
+        &self.y
+    }
+}
+
+#[test]
+fn test_generic_struct() {
+    let integer: Point<i32> = Point::<i32> { x: 1, y: 2 };
+    let float: Point<f32> = Point::<f32> { x: 1.0, y: 2.0 };
+
+    println!("{} {}", integer.x, integer.y);
+    println!("{} {}", float.x, float.y);
+}
+
+enum Value<T> {
+    None,
+    Value(T),
+}
+
+#[test]
+fn test_generic_enum() {
+    let value: Value<i32> = Value::<i32>::Value(15);
+
+    match value {
+        Value::None => {
+            println!("None")
+        }
+        Value::Value(value) => {
+            println!("value {}", value)
+        }
+    }
+}
+
+struct Hi<T: CanSayGoodBye> {
+    value: T,
+}
+
+#[test]
+fn test_generic_bound() {
+    let hi = Hi::<SimplePerson> {
+        value: SimplePerson {
+            name: String::from("Jaka"),
+        },
+    };
+
+    println!("{}", hi.value.say_goodbye());
+}
+
+fn min<T: PartialOrd>(value1: T, value2: T) -> T {
+    if value1 < value2 {
+        value1
+    } else {
+        value2
+    }
+}
+
+#[test]
+fn generic_in_function() {
+    let result = min::<i32>(1, 2);
+    println!("{}", result);
+
+    let result = min(10.0, 20.0);
+    println!("{}", result);
+}
+
+#[test]
+fn test_generic_method() {
+    let point = Point { x: 1, y: 2 };
+    println!("{}", point.get_x());
+    println!("{}", point.get_y());
+    println!("{}", point.get_value());
+}
+
+trait GetValue<T> where T: PartialOrd {
+    fn get_value(&self) -> &T;
+}
+
+impl<T: PartialOrd> GetValue<T> for Point<T> {
+    fn get_value(&self) -> &T {
+        &self.x
+    }
+}
+
+struct Apple {
+    quantity: i32,
 }
