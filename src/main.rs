@@ -1153,7 +1153,7 @@ impl<T: PartialOrd> GetValue<T> for Point<T> {
     }
 }
 
-use std::collections::VecDeque;
+use std::collections::{BTreeMap, HashMap, LinkedList, VecDeque};
 use std::ops::Add;
 
 struct Apple {
@@ -1210,7 +1210,7 @@ impl PartialOrd for Apple {
 #[test]
 fn test_partial_cmp() {
     let apple1 = Apple { quantity: 10 };
-    let apple2 = Apple { quantity: 20 }; 
+    let apple2 = Apple { quantity: 20 };
 
     println!("Apple 1 == Apple 2: {}", apple1 == apple2);
     println!("Apple 1 > Apple 2: {}", apple1 > apple2);
@@ -1244,13 +1244,13 @@ fn test_debug() {
 
 #[test]
 fn test_closure() {
-    let sum: fn(i32, i32) -> i32 = |value1: i32, value2:i32| -> i32 { value1 + value2 };
+    let sum: fn(i32, i32) -> i32 = |value1: i32, value2: i32| -> i32 { value1 + value2 };
 
     let result = sum(10, 20);
     println!("{}", result);
 }
 
-struct  Counter {
+struct Counter {
     counter: i32,
 }
 
@@ -1273,7 +1273,6 @@ fn test_counter() {
 
 #[test]
 fn test_vector() {
-
     let array = ["Eko", "Kurniawan", "Khannedy"];
 
     for value in array {
@@ -1289,7 +1288,7 @@ fn test_vector() {
 
     for name in &names {
         println!("{}", name);
-    } 
+    }
 
     println!("{:?}", names);
 }
@@ -1303,7 +1302,82 @@ fn test_vector_deque() {
 
     for name in &names {
         println!("{}", name);
-    } 
+    }
 
     println!("{:?}", names[1]);
+}
+
+#[test]
+fn test_linked_list() {
+    let mut names = LinkedList::new();
+    names.push_back(String::from("Jaka"));
+    names.push_back(String::from("Kelana"));
+    names.push_front(String::from("Umbara"));
+
+    for name in &names {
+        println!("{}", name);
+    }
+
+    println!("{:?}", names);
+}
+
+#[test]
+fn test_hash_map() {
+    let mut map = HashMap::new();
+    map.insert(String::from("name"), String::from("Jaka"));
+    map.insert(String::from("last_name"), String::from("Kelana"));
+    map.insert(String::from("age"), String::from("30"));
+
+    let name = map.get("name");
+    let last_name = map.get("last_name");
+    let age = map.get("age");
+
+    println!("Name : {}", name.unwrap());
+    println!("Last Name : {}", last_name.unwrap());
+    println!("Age : {}", age.unwrap());
+}
+
+#[test]
+fn test_btree_map() {
+    let mut map = BTreeMap::new();
+    map.insert(String::from("name"), String::from("Jaka"));
+    map.insert(String::from("last_name"), String::from("Kelana"));
+    map.insert(String::from("age"), String::from("30"));
+    map.insert(String::from("country"), String::from("Indonesia"));
+
+    for entry in map {
+        println!("Key: {}, Value: {}", entry.0, entry.1);
+    }
+}
+
+#[test]
+fn test_iterator() {
+    let array = [1, 2, 3, 4, 5];
+    let mut iterator = array.iter();
+
+    while let Some(value) = iterator.next() {
+        println!("{}", value);
+    }
+
+    for value in array.iter() {
+        println!("{}", value);
+    }
+}
+
+#[test]
+fn test_iterator_method() {
+    let vector = vec![1, 2, 3, 4, 5,6,7,8,9,10];
+    println!("{:?}", vector);
+
+    let sum = vector.iter().sum::<i32>();
+    println!("Sum : {}", sum);
+
+    let count = vector.iter().count();
+    println!("Count : {}", count);
+
+    let doubled: Vec<i32> = vector.iter().map(|value| value * 2).collect();
+    println!("{:?}", doubled);
+
+    let odd: Vec<&i32> = vector.iter().filter(|value| *value % 2 == 1).collect();
+    println!("{:?}", odd);
 }
