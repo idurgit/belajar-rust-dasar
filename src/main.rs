@@ -1153,6 +1153,7 @@ impl<T: PartialOrd> GetValue<T> for Point<T> {
     }
 }
 
+use std::cell::RefCell;
 use std::collections::{BTreeMap, HashMap, LinkedList, VecDeque};
 use std::ops::{Add, Deref};
 
@@ -1529,7 +1530,7 @@ fn test_dereference() {
 
 struct MyValue<T> {
     value: T,
-}   
+}
 
 impl<T> Deref for MyValue<T> {
     type Target = T;
@@ -1552,8 +1553,10 @@ fn say_hello_reference(name: &str) {
 
 #[test]
 fn test_deref_reference() {
-    let name = MyValue { value: "Jaka Kelana".to_string() }; 
-    say_hello_reference(&name); 
+    let name = MyValue {
+        value: "Jaka Kelana".to_string(),
+    };
+    say_hello_reference(&name);
 }
 
 #[derive(Debug)]
@@ -1561,7 +1564,7 @@ struct Book {
     title: String,
     author: String,
     pages: u32,
-} 
+}
 
 impl Drop for Book {
     fn drop(&mut self) {
@@ -1577,7 +1580,7 @@ fn test_drop() {
         pages: 208,
     };
     println!("{:?}", book);
-}   
+}
 
 enum Brand {
     of(String, Rc<Brand>),
@@ -1590,7 +1593,7 @@ fn test_multiple_ownership() {
     println!("Apple reference count: {}", Rc::strong_count(&apple));
 
     let laptop = Brand::of("Laptop".to_string(), apple.clone());
-    println!("Apple reference count: {}", Rc::strong_count(&apple)); 
+    println!("Apple reference count: {}", Rc::strong_count(&apple));
 
     {
         let phone = Brand::of("Phone".to_string(), apple.clone());
@@ -1598,4 +1601,48 @@ fn test_multiple_ownership() {
     }
 
     println!("Apple reference count: {}", Rc::strong_count(&apple));
+}
+
+#[derive(Debug)]
+struct Seller {
+    name: RefCell<String>,
+    active: RefCell<bool>,
+}
+
+#[test]
+fn test_ref_cell() {
+    let seller = Seller {
+        name: RefCell::new("Jaka Kelana".to_string()),
+        active: RefCell::new(true),
+    };
+    {
+        let mut result = seller.name.borrow_mut();
+        *result = "Eko Khannedy".to_string();
+    }
+
+    println!("{:?}", seller);
+}
+
+static APPLICATION : &str = "My Application";
+
+#[test]
+fn test_static() {
+    println!("{}", APPLICATION);
+}
+
+macro_rules! hi {
+    () => {
+        println!("Hi Macro!");
+    };
+
+    ($name:expr) => {
+        println!("Hi {}!", $name);
+    };
+}
+
+#[test]
+fn test_macro() {
+    hi!();
+    hi!("Jaka Kelana");
+    hi! { "Jaka Kelana" };
 }
